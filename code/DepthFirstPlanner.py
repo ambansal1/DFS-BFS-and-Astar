@@ -1,0 +1,74 @@
+import time
+import bisect
+class DepthFirstPlanner(object):
+
+    
+    def __init__(self, planning_env, visualize):
+        self.planning_env = planning_env
+        self.visualize = visualize
+        self.nodes = dict()
+    
+
+    def Plan(self, start_config, goal_config):
+        plan =[]
+        nodelist =[]
+        if self.visualize and hasattr(self.planning_env, 'InitializePlot'):
+            self.planning_env.InitializePlot(goal_config)
+        Lowerlimits = self.planning_env.lower_limits;
+        Upperlimits = self.planning_env.upper_limits;
+        #self.planning_env.discrete_env.resolution = 1
+
+        obj = self.planning_env.discrete_env
+        
+
+        a = obj.ConfigurationToGridCoord(goal_config)
+        b = obj.ConfigurationToGridCoord(start_config)
+        targetnodeid = obj.GridCoordToNodeId(a)
+        currentnodeid = obj.GridCoordToNodeId(b)
+
+        start = currentnodeid
+        visited = []
+        stack = [currentnodeid]
+
+
+        vertex = currentnodeid
+        count = 0
+            #visited, stack = set(), [start]
+        while stack and (vertex != targetnodeid):
+            
+
+            if vertex not in visited:
+                visited.append(vertex)
+
+                for value in (self.planning_env.GetSuccessors(vertex)): 
+                    stack.append(value)
+
+
+                        #print plan_id[count], count
+                        #print self.planning_env.discrete_env.NodeIdToConfiguration(plan_id[count-1]),self.planning_env.discrete_env.NodeIdToConfiguration(current)
+
+            count = count + 1;
+
+        
+            prevvertex = vertex
+            vertex = stack.pop()
+            
+            plannodeid = visited
+            #if self.visualize and hasattr(self.planning_env, 'InitializePlot'):
+                #self.planning_env.PlotEdge(self.planning_env.discrete_env.NodeIdToConfiguration(vertex),self.planning_env.discrete_env.NodeIdToConfiguration(plannodeid[len(plannodeid)-1]))
+            
+            nodelist.append(vertex)
+
+        
+
+        plannodeid.append(targetnodeid)
+
+        
+
+
+
+        for i in range(0,len(plannodeid)):
+            temp = (obj.NodeIdToGridCoord(plannodeid[i]))
+            plan.append(obj.GridCoordToConfiguration(temp))
+
+        return plan
